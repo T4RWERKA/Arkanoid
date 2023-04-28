@@ -14,8 +14,6 @@ namespace Classes
         public int durability;
         private Bonuses bonuses;
 
-        public event EventHandler TileBreaks;
-
         public FieldTile() : base() 
         {
             shape.Texture = new Texture("D:\\Study\\ООП\\Classes\\Classes\\Textures\\RedTile.png");
@@ -29,18 +27,13 @@ namespace Classes
             bonuses = new Bonuses();
             shape.Texture = new Texture("D:\\Study\\ООП\\Classes\\Classes\\Textures\\RedTile.png");
         }
-        public void Break() 
-        {
-            broken = true;
-        }
         public void AddBonus() { }
 
-        public override void CollisionHandler(object? sender, CollisionEventArgs e)
+        public override void OnCollision(object? sender, CollisionEventArgs e)
         {
             DisplayObject obj = (e.obj1 == this) ? e.obj2 : e.obj1;
             if (breakable)
             {
-                TileBreaks?.Invoke(this, EventArgs.Empty);
                 Break();
             }
         }

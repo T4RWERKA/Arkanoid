@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Color = SFML.Graphics.Color;
 using System.Text.Json;
+using System.Reflection;
 
 namespace Classes
 {
@@ -18,13 +19,14 @@ namespace Classes
     {
         private Players players;
         private GameField gameField;
-        private List<DisplayObject> displayObjects;
+        private List<DisplayObject>? displayObjects;
         private Sprite backgroundSprite;
         public RenderWindow window;
         private bool isStoped;
         private bool isWiorking;
 
         public event EventHandler<CollisionEventArgs> CollisionEvent;
+        public event EventHandler LoseEvent;
 
         public Game()
         {
@@ -32,9 +34,12 @@ namespace Classes
             window.SetFramerateLimit(60);
             window.Closed += (sender, args) => window.Close();
             window.KeyPressed += OnKeyPressed;
+            LoseEvent += OnLose;
 
             displayObjects = new List<DisplayObject>();
             gameField = new GameField(displayObjects, (int)window.Size.X, (int)window.Size.Y);
+            gameField.WinEvent += OnWin;
+
             Texture texture = new Texture("D:\\Study\\ООП\\Classes\\Classes\\Textures\\GreenBackground.png");
             backgroundSprite = new Sprite(texture);
             backgroundSprite.Scale = new Vector2f((float)window.Size.X / backgroundSprite.TextureRect.Width, (float)window.Size.Y / backgroundSprite.TextureRect.Height);
@@ -44,6 +49,25 @@ namespace Classes
             gameField.InitField(displayObjects);
             window.KeyPressed += gameField.playerTile.OnKeyPressed;
             window.KeyReleased += gameField.playerTile.OnKeyReleased;
+        }
+        private void OnLose(object? sender, EventArgs e)
+        {
+            // Lose();
+        }
+        private void OnWin(object? sender, EventArgs e)
+        {
+            Stop();
+            MessageBox.Show
+            (
+                "You won",
+                "You won",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information,
+                MessageBoxDefaultButton.Button1,
+                MessageBoxOptions.DefaultDesktopOnly
+            );
+            window.Close();
+            isWiorking = false;
         }
         private void OnKeyPressed(object? sender, SFML.Window.KeyEventArgs e)
         {
@@ -89,11 +113,16 @@ namespace Classes
                         DisplayObject obj2 = displayObjects[j];
                         if (!obj2.broken && obj1.MyIntersects(obj2))
                         {
-                            CollisionEvent += obj1.CollisionHandler;
-                            CollisionEvent += obj2.CollisionHandler;
+                            CollisionEvent += obj1.OnCollision;
+                            CollisionEvent += obj2.OnCollision;
                             CollisionEvent?.Invoke(this, new CollisionEventArgs(obj1, obj2));
-                            CollisionEvent -= obj1.CollisionHandler;
-                            CollisionEvent -= obj2.CollisionHandler;
+                            CollisionEvent -= obj1.OnCollision;
+                            CollisionEvent -= obj2.OnCollision;
+
+                            if (obj1 is FieldTile && obj1.top == window.Size.Y || obj2 is FieldTile && obj2.top == window.Size.Y)
+                            {
+                                LoseEvent?.Invoke(this, EventArgs.Empty);
+                            }
                         }
                     }
                 }
@@ -144,31 +173,28 @@ namespace Classes
         }
         public async Task Load() 
         {
-            var serializeOptions = new JsonSerializerOptions();
-            serializeOptions.Converters.Add(new DisplayObjectConverterWithTypeDiscriminator());
-
-            using (FileStream fs = new FileStream("user.json", FileMode.Open, FileAccess.Read))
-            {
-                displayObjects = await JsonSerializer.DeserializeAsync<List<DisplayObject>>(fs, serializeOptions);
-            }
-        }
-        private async Task SerializeJson(FileStream fs)
-        {
-            var serializeOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                IncludeFields = true
-            };
-            serializeOptions.Converters.Add(new DisplayObjectConverterWithTypeDiscriminator());
-
-            await JsonSerializer.SerializeAsync<List<DisplayObject>>(fs, displayObjects, serializeOptions);
+            displayObjects = TxtSerializator.DeserializeTxt("state.txt");
+            // displayObjects = await Serializator.DeserializeJson("state.json");
         }
         public async void Save() 
         {
-            using (FileStream fs = new FileStream("user.json", FileMode.Create, FileAccess.Write))
-            {
-                await SerializeJson(fs);
-            }
+            await JsonSerializator.SerializeJson("state.json", displayObjects);
+            await TxtSerializator.SerializeTxt("state.txt", displayObjects);
+        }
+        public void Lose()
+        {
+            Stop();
+            MessageBox.Show
+            (
+                "You lost",
+                "You lost",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information,
+                MessageBoxDefaultButton.Button1,
+                MessageBoxOptions.DefaultDesktopOnly
+            );
+            window.Close();
+            isWiorking = false;
         }
     }
 

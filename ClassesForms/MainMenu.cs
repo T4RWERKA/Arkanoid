@@ -5,7 +5,7 @@ namespace ClassesForms
 {
     public partial class MainMenu : Form
     {
-        private Game game;
+        private Game? game;
         public MainMenu()
         {
             InitializeComponent();
@@ -29,6 +29,7 @@ namespace ClassesForms
             game.InitGame();
             game.GameLoop();
             Show();
+            Focus();
         }
 
         private void btnExit_Click(object sender, EventArgs e)

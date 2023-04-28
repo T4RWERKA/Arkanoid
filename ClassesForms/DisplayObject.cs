@@ -22,7 +22,7 @@ namespace Classes
         public Shape shape;
         public Vector2i speed;
         public abstract void Draw(RenderTarget target, RenderStates states);
-        public abstract void CollisionHandler(object? sender, CollisionEventArgs e);
+        public abstract void OnCollision(object? sender, CollisionEventArgs e);
         public void InitCoordinates()
         {
             FloatRect rect = shape.GetGlobalBounds();
@@ -38,8 +38,8 @@ namespace Classes
         }
         public bool MyIntersects(DisplayObject obj)
         {
-            return shape.GetGlobalBounds().Intersects(obj.shape.GetGlobalBounds());
-            //return left < obj.right && right > obj.left && top < obj.bottom && bottom > obj.top;
+            // return shape.GetGlobalBounds().Intersects(obj.shape.GetGlobalBounds());
+            return left < obj.right && right > obj.left && top < obj.bottom && bottom > obj.top;
         }
         public void ReflectX()
         {

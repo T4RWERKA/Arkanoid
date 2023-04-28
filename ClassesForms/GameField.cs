@@ -21,8 +21,12 @@ namespace Classes
         public PlayerTile playerTile;
         private ProgressBar progressBar;
         public List<DisplayObject> displayObjects;
+        private int tilesNumber;
+
+        public event EventHandler WinEvent;
         public void InitField(List<DisplayObject> displayObjects)
         {
+            tilesNumber = 0;
             if (displayObjects.Count == 0)
             {
                 // создаем четыре прямоугольника вокруг окна
@@ -67,12 +71,12 @@ namespace Classes
                 borders[3].bottom = height;
 
                 // добавляем границы в список отображаемых объектов
-                foreach (DisplayObject border in borders)
+                foreach (DisplayObject? border in borders)
                 {
                     border.shape.FillColor = borderColor;
                     border.InitCoordinates();
                     displayObjects.Add(border);
-                    fieldTiles.Add(border as Tile);
+                    fieldTiles.Add(border as Tile, ref tilesNumber, OnTileBreaks);
                 }
 
                 int speedCoef = 100;
@@ -89,7 +93,7 @@ namespace Classes
                     {
                         var tile = new FieldTile(i, j);
                         displayObjects.Add(tile);
-                        fieldTiles.Add(tile);
+                        fieldTiles.Add(tile, ref tilesNumber, OnTileBreaks);
                     }
                 }
             }
@@ -100,7 +104,7 @@ namespace Classes
                     switch (displayObjects[i])
                     {
                         case FieldTile fieldTile:
-                            fieldTiles.Add(fieldTile);
+                            fieldTiles.Add(fieldTile, ref tilesNumber, OnTileBreaks);
                             break;
                         case Ball ball:
                             balls.Add(ball);
@@ -112,7 +116,6 @@ namespace Classes
                 }
             }
         }
-
         public GameField(List<DisplayObject> displayObjects, int width, int height)
         {
             fieldTiles = new Tiles();
@@ -120,6 +123,12 @@ namespace Classes
             this.displayObjects = displayObjects;
             this.width = width;
             this.height = height;
+        }
+        public void OnTileBreaks(object? sender, EventArgs e)
+        {
+            tilesNumber--;
+            if (tilesNumber == 0)
+                WinEvent?.Invoke(this, EventArgs.Empty);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Classes
             ((Drawable)shape).Draw(target, states);
         }
 
-        public override void CollisionHandler(object? sender, CollisionEventArgs e)
+        public override void OnCollision(object? sender, CollisionEventArgs e)
         {
             DisplayObject obj = (e.obj1 == this) ? e.obj2 : e.obj1; 
             if (left < obj.left || right > obj.right)

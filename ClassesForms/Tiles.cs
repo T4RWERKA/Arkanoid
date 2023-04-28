@@ -10,5 +10,14 @@ namespace Classes
 {
     internal class Tiles: List<Tile>
     {
+        public void Add(Tile tile, ref int tilesNumber, EventHandler eventHandler)
+        {
+            ((List<Tile>)this).Add(tile);
+            if (tile.breakable && !tile.broken)
+            {
+                tilesNumber++;
+                tile.TileBreaksEvent += eventHandler;
+            }
+        }
     }
 }

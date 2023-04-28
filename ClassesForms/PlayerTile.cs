@@ -41,7 +41,7 @@ namespace Classes
             speed = new Vector2i(0, 0);
         }
 
-        public override void CollisionHandler(object? sender, CollisionEventArgs e)
+        public override void OnCollision(object? sender, CollisionEventArgs e)
         {
             DisplayObject obj = (e.obj1 == this) ? e.obj2 : e.obj1;
             if (obj is Tile)

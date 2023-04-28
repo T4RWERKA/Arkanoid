@@ -11,6 +11,7 @@ namespace Classes
 {
     internal abstract class Tile : DisplayObject
     {
+        public event EventHandler TileBreaksEvent;
         public Tile() : base()
         { 
             shape = new RectangleShape();
@@ -37,6 +38,11 @@ namespace Classes
         public override void Draw(RenderTarget target, RenderStates states)
         {
             ((Drawable)shape).Draw(target, states);
+        }
+        public void Break()
+        {
+            broken = true;
+            TileBreaksEvent?.Invoke(this, EventArgs.Empty);
         }
     }
 }
