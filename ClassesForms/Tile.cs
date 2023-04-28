@@ -27,7 +27,7 @@ namespace Classes
             this.breakable = breakable;
             this.movable = movable;
             this.breaking = breaking;
-            speed = new Vector2f(speed_X, speed_Y);
+            speed = new Vector2i(speed_X, speed_Y);
             shape = new RectangleShape();
             shape.Position = new Vector2f(x, y);
             ((RectangleShape)shape).Size = new Vector2f(width, height);

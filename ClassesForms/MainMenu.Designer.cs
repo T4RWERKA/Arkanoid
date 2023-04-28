@@ -78,7 +78,7 @@
             btnExit.UseVisualStyleBackColor = true;
             btnExit.Click += btnExit_Click;
             // 
-            // Form1
+            // MainMenu
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -87,8 +87,9 @@
             Controls.Add(btnLoad);
             Controls.Add(btnStart);
             Controls.Add(lblName);
-            Name = "Form1";
+            Name = "MainMenu";
             Text = "Form1";
+            KeyDown += MainMenu_KeyDown;
             ResumeLayout(false);
             PerformLayout();
         }

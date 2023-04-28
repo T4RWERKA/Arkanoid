@@ -15,6 +15,7 @@ namespace ClassesForms
     {
         public event EventHandler ExitEvent;
         public event EventHandler ContinueEvent;
+        public event EventHandler LoadEvent;
         public event EventHandler SaveEvent;
         public MyMenu()
         {
@@ -36,12 +37,22 @@ namespace ClassesForms
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-
+            Close();
+            LoadEvent?.Invoke(this, EventArgs.Empty);
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
             SaveEvent?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void MyMenu_KeyPress(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape) 
+            {
+                Close();
+            }
+
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Classes
 {
     internal class GameField
     {
-        public uint width, height;
+        public int width, height;
         private Tiles fieldTiles;
         public Balls balls;
         public PlayerTile playerTile;
@@ -52,7 +52,7 @@ namespace Classes
 
                 // левая граница
                 borders[2].shape = new RectangleShape(new Vector2f(borderThickness, height));
-                borders[2].shape.Position = new Vector2f(-borderThickness + 0.5f, 0);
+                borders[2].shape.Position = new Vector2f(-borderThickness, 0);
                 borders[2].left = -borderThickness;
                 borders[2].right = 0;
                 borders[2].top = 0;
@@ -75,7 +75,9 @@ namespace Classes
                     fieldTiles.Add(border as Tile);
                 }
 
-                var ball = new Ball(width / 2, (uint)(width * 0.75));
+                int speedCoef = 100;
+                var ball = new Ball(width / 2, (int)(width * 0.75));
+                ball.speed = new Vector2i(width / speedCoef, height / speedCoef);
                 displayObjects.Add(ball);
                 balls.Add(ball);
                 playerTile = new PlayerTile((int)width / 2, (int)(ball.bottom + 40));
@@ -111,7 +113,7 @@ namespace Classes
             }
         }
 
-        public GameField(List<DisplayObject> displayObjects, uint width, uint height)
+        public GameField(List<DisplayObject> displayObjects, int width, int height)
         {
             fieldTiles = new Tiles();
             balls = new Balls();

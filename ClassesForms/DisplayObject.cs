@@ -17,10 +17,10 @@ namespace Classes
     internal abstract class DisplayObject : Drawable
     {
         public bool movable, breakable, broken, breaking;
-        public double left, right, top, bottom;
+        public int left, right, top, bottom;
         [JsonIgnore]
         public Shape shape;
-        public Vector2f speed;
+        public Vector2i speed;
         public abstract void Draw(RenderTarget target, RenderStates states);
         public abstract void CollisionHandler(object? sender, CollisionEventArgs e);
         public void InitCoordinates()
@@ -53,7 +53,7 @@ namespace Classes
         {
             if (movable)
             {
-                shape.Position += speed;
+                shape.Position += (Vector2f)speed;
                 left += speed.X;
                 right += speed.X;
                 top += speed.Y;

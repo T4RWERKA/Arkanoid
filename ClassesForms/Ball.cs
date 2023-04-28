@@ -20,11 +20,10 @@ namespace Classes
             ((CircleShape)shape).Radius = 10;
             shape.FillColor = SFML.Graphics.Color.White;
         }
-        public Ball(uint x, uint y, uint radius = 10) : base()
+        public Ball(int x, int y, int radius = 10) : base()
         {
             breakable = false;
             movable = breaking = true;
-            speed = new Vector2f(0.2f, 0.2f);
             shape = new CircleShape();
             shape.Position = new Vector2f(x, y);
             ((CircleShape)shape).Radius = radius;
@@ -41,7 +40,7 @@ namespace Classes
         public override void CollisionHandler(object? sender, CollisionEventArgs e)
         {
             DisplayObject obj = (e.obj1 == this) ? e.obj2 : e.obj1; 
-            if (right < obj.left || left > obj.right)
+            if (left < obj.left || right > obj.right)
                 ReflectX();
             else
                 ReflectY();

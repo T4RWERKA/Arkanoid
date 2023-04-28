@@ -29,12 +29,12 @@ namespace Classes
         public Game()
         {
             window = new RenderWindow(new VideoMode(600, 600), "Arkanoid");
-            // window.SetFramerateLimit(60);
+            window.SetFramerateLimit(60);
             window.Closed += (sender, args) => window.Close();
             window.KeyPressed += OnKeyPressed;
 
             displayObjects = new List<DisplayObject>();
-            gameField = new GameField(displayObjects, window.Size.X, window.Size.Y);
+            gameField = new GameField(displayObjects, (int)window.Size.X, (int)window.Size.Y);
             Texture texture = new Texture("D:\\Study\\ООП\\Classes\\Classes\\Textures\\GreenBackground.png");
             backgroundSprite = new Sprite(texture);
             backgroundSprite.Scale = new Vector2f((float)window.Size.X / backgroundSprite.TextureRect.Width, (float)window.Size.Y / backgroundSprite.TextureRect.Height);
@@ -56,6 +56,7 @@ namespace Classes
                 menu.ContinueEvent += OnMyMenuContinue;
                 menu.FormClosed += OnMyMenuContinue;
                 menu.SaveEvent += OnMyMenuSave;
+                menu.LoadEvent += OnMyMenuLoad;
             }
         }
         private void OnMyMenuExit(object? sender, EventArgs e)
@@ -66,6 +67,11 @@ namespace Classes
         private void OnMyMenuContinue(object? sender, EventArgs e) 
         { 
             Continue(); 
+        }
+        private async void OnMyMenuLoad(object? sender, EventArgs e)
+        {
+            await Load();
+            InitGame();
         }
         private void OnMyMenuSave(object? sender, EventArgs e) 
         {

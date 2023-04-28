@@ -91,24 +91,24 @@ namespace ClassesForms
                             obj.breaking = breaking;
                             break;
                         case "left":
-                            double left = reader.GetDouble();
+                            int left = reader.GetInt32();
                             obj.left = left;
                             break;
                         case "right":
-                            double right = reader.GetDouble();
+                            int right = reader.GetInt32();
                             obj.right = right;
                             break;
                         case "top":
-                            double top = reader.GetDouble();
+                            int top = reader.GetInt32();
                             obj.top = top;
                             break;
                         case "bottom":
-                            double bottom = reader.GetDouble();
+                            int bottom = reader.GetInt32();
                             obj.bottom = bottom;
                             break;
                         case "speed":
-                            List<float> speed = JsonSerializer.Deserialize<List<float>>(ref reader);
-                            obj.speed = new Vector2f(speed[0], speed[1]);
+                            List<int> speed = JsonSerializer.Deserialize<List<int>>(ref reader);
+                            obj.speed = new Vector2i(speed[0], speed[1]);
                             break;
                         case "damage":
                             uint damage = reader.GetUInt32();

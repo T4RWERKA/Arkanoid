@@ -11,7 +11,7 @@ namespace Classes
 {
     internal class PlayerTile: Tile
     {
-        private float defaultSpeed = 0.2f;
+        private int defaultSpeed = 5;
         public PlayerTile() : base() 
         {
             shape.Texture = new Texture("D:\\Study\\ООП\\Classes\\Classes\\Textures\\PlayerTile.png");
@@ -30,15 +30,15 @@ namespace Classes
         }
         public void LeftSpeed()
         {
-            speed = new Vector2f(-defaultSpeed, 0);
+            speed = new Vector2i(-defaultSpeed, 0);
         }
         public void RightSpeed()
         {
-            speed = new Vector2f(defaultSpeed, 0);
+            speed = new Vector2i(defaultSpeed, 0);
         }
         public void Stop()
         {
-            speed = new Vector2f(0, 0);
+            speed = new Vector2i(0, 0);
         }
 
         public override void CollisionHandler(object? sender, CollisionEventArgs e)
