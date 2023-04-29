@@ -5,18 +5,39 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Color = SFML.Graphics.Color;
 
 namespace Classes
 {
-    internal class FieldTile: Tile
+    internal class FieldTile : Tile
     {
-        [JsonInclude]
+        private const string transparentTexturePath = @"textures\TransparentTexture.png";
+        private const string redTexturePath = @"textures\RedTile.png";
+
         public int durability;
+        public MyColor color 
+        {
+            get
+            {
+                return _color;
+            }
+            set
+            {
+                _color = value;
+                shape.Texture = new Texture(value switch
+                {
+                    MyColor.Transparent => transparentTexturePath,
+                    MyColor.Red => redTexturePath,
+                    _ => throw new NotImplementedException(),
+                }
+                );
+            }
+        }
+        private MyColor _color;
         private Bonuses bonuses;
 
         public FieldTile() : base() 
         {
-            shape.Texture = new Texture("D:\\Study\\ООП\\Classes\\Classes\\Textures\\RedTile.png");
         }
         public FieldTile(int x, int y, int width, int height) : 
             base(x, y, width, height)
@@ -25,14 +46,14 @@ namespace Classes
             base(x, y, width, height, breakable, movable, breaking, speed_X, speed_Y)
         {
             bonuses = new Bonuses();
-            shape.Texture = new Texture("D:\\Study\\ООП\\Classes\\Classes\\Textures\\RedTile.png");
+            color = MyColor.Red;
         }
         public void AddBonus() { }
 
         public override void OnCollision(object? sender, CollisionEventArgs e)
         {
             DisplayObject obj = (e.obj1 == this) ? e.obj2 : e.obj1;
-            if (breakable)
+            if (breakable && obj.breaking)
             {
                 Break();
             }

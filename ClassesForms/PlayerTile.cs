@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using ClassesForms;
+using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 using System;
@@ -11,16 +12,20 @@ namespace Classes
 {
     internal class PlayerTile: Tile
     {
+        private static readonly string texturePath = @"textures\PlayerTile.png";
+
         private int defaultSpeed = 5;
+
+        public event EventHandler<CatchBonusEventArgs> CatchBonusEvent;
         public PlayerTile() : base() 
         {
-            shape.Texture = new Texture("D:\\Study\\ООП\\Classes\\Classes\\Textures\\PlayerTile.png");
+            shape.Texture = new Texture(texturePath);
             ((RectangleShape)shape).Size = new Vector2f(shape.Texture.Size.X * 3, shape.Texture.Size.Y * 3);
         }
         public PlayerTile(int x, int y, int width = 64, int height = 32, bool breakable = false, bool movable = true, bool breaking = false) :
             base(x, y, width, height, breakable, movable, breaking)
         {
-            shape.Texture = new Texture("D:\\Study\\ООП\\Classes\\Classes\\Textures\\PlayerTile.png");
+            shape.Texture = new Texture(texturePath);
             ((RectangleShape)shape).Size = new Vector2f(shape.Texture.Size.X * 3, shape.Texture.Size.Y * 3);
             InitCoordinates();
         }
@@ -49,6 +54,10 @@ namespace Classes
                 ReflectX();
                 Move();
             }
+            else if (obj is Bonus)
+            {
+                CatchBonusEvent?.Invoke(this, new CatchBonusEventArgs((obj as Bonus).type));
+            }
         }
         public void OnKeyPressed(object? sender, SFML.Window.KeyEventArgs e)
         {
@@ -67,6 +76,14 @@ namespace Classes
             {
                 Stop();
             }
+        }
+    }
+    public class CatchBonusEventArgs: EventArgs
+    {
+        public BonusType bonusType;
+        public CatchBonusEventArgs(BonusType bonusType) 
+        {
+            this.bonusType = bonusType;
         }
     }
 }

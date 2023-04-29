@@ -12,11 +12,12 @@ namespace ClassesForms
             StartPosition = FormStartPosition.CenterScreen;
         }
 
-        private void btnStart_Click(object sender, EventArgs e)
+        private async void btnStart_Click(object sender, EventArgs e)
         {
             Hide();
             game = new Game();
             game.InitGame();
+            await game.Save("begin_state");
             game.GameLoop();
             Show();
         }
@@ -25,11 +26,10 @@ namespace ClassesForms
         {
             Hide();
             game = new Game();
-            await game.Load();
+            await game.Load("save");
             game.InitGame();
             game.GameLoop();
             Show();
-            Focus();
         }
 
         private void btnExit_Click(object sender, EventArgs e)

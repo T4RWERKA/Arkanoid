@@ -1,29 +1,43 @@
-﻿using SFML.Graphics;
+﻿using ClassesForms;
+using SFML.Graphics;
 using SFML.System;
-using SFML.Window;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Formats.Asn1.AsnWriter;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 namespace Classes
 {
-    internal class GameField
+    internal class GameField: Drawable
     {
+        private static readonly string backgroundImagePath = @"textures\GreenBackground.png";
+
         public int width, height;
+        public Sprite backgroundSprite;
         private Tiles fieldTiles;
         public Balls balls;
+        public Bonuses bonuses;
         public PlayerTile playerTile;
-        private ProgressBar progressBar;
         public List<DisplayObject> displayObjects;
         private int tilesNumber;
+        public InfoField infoField;
 
         public event EventHandler WinEvent;
+        public event EventHandler<UpdateFieldEventArgs> UpdateFieldEvent;
+        public GameField(List<DisplayObject> displayObjects, int gameAreaWidth, int infoAreaWidth, int height)
+        {
+            fieldTiles = new Tiles();
+            balls = new Balls();
+            bonuses = new Bonuses();
+            this.displayObjects = displayObjects;
+            this.width = gameAreaWidth;
+            this.height = height;
+
+            Texture texture = new Texture(backgroundImagePath);
+            backgroundSprite = new Sprite(texture);
+            backgroundSprite.Position = new Vector2f(0, 0);
+            backgroundSprite.Scale = new Vector2f((float)width / backgroundSprite.TextureRect.Width, (float)height / backgroundSprite.TextureRect.Height);
+
+            infoField = new InfoField(infoAreaWidth, height, new Vector2i(gameAreaWidth, 0));
+            UpdateFieldEvent += infoField.OnUpdateField;
+        }
         public void InitField(List<DisplayObject> displayObjects)
         {
             tilesNumber = 0;
@@ -31,7 +45,7 @@ namespace Classes
             {
                 // создаем четыре прямоугольника вокруг окна
                 int borderThickness = 50;
-                SFML.Graphics.Color borderColor = SFML.Graphics.Color.Red;
+                SFML.Graphics.Color borderColor = SFML.Graphics.Color.Transparent;
                 FieldTile[] borders = new FieldTile[4];
                 for (int i = 0; i < 4; i++)
                 {
@@ -73,7 +87,7 @@ namespace Classes
                 // добавляем границы в список отображаемых объектов
                 foreach (DisplayObject? border in borders)
                 {
-                    border.shape.FillColor = borderColor;
+                    ((FieldTile)border).color = MyColor.Transparent;
                     border.InitCoordinates();
                     displayObjects.Add(border);
                     fieldTiles.Add(border as Tile, ref tilesNumber, OnTileBreaks);
@@ -115,20 +129,41 @@ namespace Classes
                     }
                 }
             }
-        }
-        public GameField(List<DisplayObject> displayObjects, int width, int height)
-        {
-            fieldTiles = new Tiles();
-            balls = new Balls();
-            this.displayObjects = displayObjects;
-            this.width = width;
-            this.height = height;
+            UpdateFieldEvent?.Invoke(this, new UpdateFieldEventArgs(displayObjects));
         }
         public void OnTileBreaks(object? sender, EventArgs e)
         {
             tilesNumber--;
             if (tilesNumber == 0)
+            {
                 WinEvent?.Invoke(this, EventArgs.Empty);
+            }
+            else
+            {
+                Random random = new Random();
+                double probability = 0.2;
+                double randomValue = random.NextDouble();
+                if (randomValue < probability)
+                {
+                    var bonus = new Bonus(((Tile)sender).left, ((Tile)sender).top);
+                    bonuses.Add(bonus);
+                    displayObjects.Add(bonus);
+                }
+            }
+        }
+
+        public void Draw(RenderTarget target, RenderStates states)
+        {
+            target.Draw(backgroundSprite, states);
+            target.Draw(infoField, states);
+        }
+    }
+    internal class UpdateFieldEventArgs : EventArgs
+    {
+        public List<DisplayObject> displayObjects;
+        public UpdateFieldEventArgs(List<DisplayObject> displayObjects)
+        {
+            this.displayObjects = displayObjects;
         }
     }
 }

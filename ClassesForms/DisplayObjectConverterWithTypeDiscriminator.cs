@@ -118,6 +118,10 @@ namespace ClassesForms
                             int durability = reader.GetInt32();
                             ((FieldTile)obj).durability = durability;
                             break;
+                        case "color":
+                            MyColor color = (MyColor)reader.GetInt32();
+                            ((FieldTile)obj).color = color;
+                            break;
                     }
                 }
             }
@@ -143,6 +147,7 @@ namespace ClassesForms
                 case FieldTile fieldTile:
                     writer.WriteNumber("TypeDiscriminator", (int)TypeDiscriminator.FieldTile);
                     writer.WriteNumber("durability", fieldTile.durability);
+                    writer.WriteNumber("color", (int)fieldTile.color);
                     break;
                 default:
                     throw new InvalidOperationException("Unexpected object type.");

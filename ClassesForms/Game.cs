@@ -15,34 +15,43 @@ using System.Reflection;
 
 namespace Classes
 {
+    public enum MyColor
+    {
+        Transparent,
+        Red
+    }
     internal class Game
     {
         private Players players;
         private GameField gameField;
         private List<DisplayObject>? displayObjects;
-        private Sprite backgroundSprite;
         public RenderWindow window;
         private bool isStoped;
         private bool isWiorking;
 
         public event EventHandler<CollisionEventArgs> CollisionEvent;
-        public event EventHandler LoseEvent;
+        public event EventHandler BallFellEvent;
 
         public Game()
         {
-            window = new RenderWindow(new VideoMode(600, 600), "Arkanoid");
+            uint height = 600;
+            uint gameFieldWidth = 600;
+            uint infoFieldWidth = 300;
+            window = new RenderWindow(new VideoMode(gameFieldWidth + infoFieldWidth, height), "Arkanoid");
             window.SetFramerateLimit(60);
             window.Closed += (sender, args) => window.Close();
             window.KeyPressed += OnKeyPressed;
-            LoseEvent += OnLose;
+            BallFellEvent += OnBallFell;
 
             displayObjects = new List<DisplayObject>();
-            gameField = new GameField(displayObjects, (int)window.Size.X, (int)window.Size.Y);
-            gameField.WinEvent += OnWin;
+            gameField = new GameField(displayObjects, (int)gameFieldWidth, (int)infoFieldWidth, (int)height);
+            gameField.infoField.LoseEvent += OnLose;
+            BallFellEvent += gameField.infoField.OnBallFell;
 
-            Texture texture = new Texture("D:\\Study\\ООП\\Classes\\Classes\\Textures\\GreenBackground.png");
-            backgroundSprite = new Sprite(texture);
-            backgroundSprite.Scale = new Vector2f((float)window.Size.X / backgroundSprite.TextureRect.Width, (float)window.Size.Y / backgroundSprite.TextureRect.Height);
+            players = new Players();
+            var player = new Player(gameField);
+            player.WinEvent += OnWin;
+            players.Add(player);
         }
         public void InitGame()
         {
@@ -52,14 +61,30 @@ namespace Classes
         }
         private void OnLose(object? sender, EventArgs e)
         {
-            // Lose();
+            Stop();
+            MessageBox.Show
+            (
+                "You lost",
+                "You lost",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information,
+                MessageBoxDefaultButton.Button1,
+                MessageBoxOptions.DefaultDesktopOnly
+            );
+            window.Close();
+            isWiorking = false;
+        }
+        private async void OnBallFell(object? sender, EventArgs e)
+        {
+            /*await Load("begin_state");
+            InitGame();*/
         }
         private void OnWin(object? sender, EventArgs e)
         {
             Stop();
             MessageBox.Show
             (
-                "You won",
+                $"You won\nScore: {((Player)sender).score}",
                 "You won",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information,
@@ -94,12 +119,12 @@ namespace Classes
         }
         private async void OnMyMenuLoad(object? sender, EventArgs e)
         {
-            await Load();
+            await Load("save");
             InitGame();
         }
-        private void OnMyMenuSave(object? sender, EventArgs e) 
+        private async void OnMyMenuSave(object? sender, EventArgs e) 
         {
-            Save();
+            await Save("save");
         }
         public void CheckCollisions()
         {
@@ -119,10 +144,9 @@ namespace Classes
                             CollisionEvent -= obj1.OnCollision;
                             CollisionEvent -= obj2.OnCollision;
 
-                            if (obj1 is FieldTile && obj1.top == window.Size.Y || obj2 is FieldTile && obj2.top == window.Size.Y)
-                            {
-                                LoseEvent?.Invoke(this, EventArgs.Empty);
-                            }
+                            if (obj1 is FieldTile && obj2 is Ball && obj1.top == gameField.height || 
+                                obj2 is FieldTile && obj1 is Ball && obj2.top == gameField.height)
+                                BallFellEvent?.Invoke(this, EventArgs.Empty);
                         }
                     }
                 }
@@ -139,7 +163,7 @@ namespace Classes
 
         private void DrawField()
         {
-            window.Draw(backgroundSprite);
+            window.Draw(gameField);
             foreach (DisplayObject obj in displayObjects)
             {
                 if (!obj.broken)
@@ -158,6 +182,7 @@ namespace Classes
                 {
                     CheckCollisions();
                     MoveObjects();
+                    window.Clear();
                     DrawField();
                     window.Display();
                 }
@@ -171,34 +196,19 @@ namespace Classes
         {
             isStoped = true;
         }
-        public async Task Load() 
+        public async Task Load(string fileName) 
         {
-            displayObjects = TxtSerializator.DeserializeTxt("state.txt");
-            // displayObjects = await Serializator.DeserializeJson("state.json");
+            displayObjects = TxtSerializator.DeserializeTxt($"{fileName}.txt");
+            displayObjects = await JsonSerializator.DeserializeJson($"{fileName}.json");
         }
-        public async void Save() 
+        public async Task Save(string fileName) 
         {
-            await JsonSerializator.SerializeJson("state.json", displayObjects);
-            await TxtSerializator.SerializeTxt("state.txt", displayObjects);
-        }
-        public void Lose()
-        {
-            Stop();
-            MessageBox.Show
-            (
-                "You lost",
-                "You lost",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.DefaultDesktopOnly
-            );
-            window.Close();
-            isWiorking = false;
+            await JsonSerializator.SerializeJson($"{fileName}.json", displayObjects);
+            await TxtSerializator.SerializeTxt($"{fileName}.txt", displayObjects);
         }
     }
 
-    internal class CollisionEventArgs : EventArgs
+    internal class CollisionEventArgs: EventArgs
     {
         public DisplayObject obj1, obj2;
         public CollisionEventArgs(DisplayObject obj1, DisplayObject obj2)

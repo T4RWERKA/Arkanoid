@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using ClassesForms;
+using SFML.Graphics;
 using SFML.System;
 using System;
 using System.Collections.Generic;
@@ -40,10 +41,13 @@ namespace Classes
         public override void OnCollision(object? sender, CollisionEventArgs e)
         {
             DisplayObject obj = (e.obj1 == this) ? e.obj2 : e.obj1; 
-            if (left < obj.left || right > obj.right)
-                ReflectX();
-            else
-                ReflectY();
+            if (obj is not Bonus)
+            {
+                if (left < obj.left || right > obj.right)
+                    ReflectX();
+                else
+                    ReflectY();
+            }
         }
     }
 }

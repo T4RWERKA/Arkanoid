@@ -12,7 +12,7 @@ namespace Classes
     {
         public void Add(Tile tile, ref int tilesNumber, EventHandler eventHandler)
         {
-            ((List<Tile>)this).Add(tile);
+            Add(tile);
             if (tile.breakable && !tile.broken)
             {
                 tilesNumber++;

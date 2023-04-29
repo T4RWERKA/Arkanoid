@@ -13,10 +13,12 @@ using System.Threading.Tasks;
 
 namespace ClassesForms
 {
-    internal class TxtSerializator
+    internal static class TxtSerializator
     {
         private static readonly string beginObject = "{\n";
         private static readonly string endObject = "},\n";
+        private static readonly char[] trimChars = { ' ', '\n', '\t', ',', '.', ';', ':', '!', '?', '-' };
+
         public static List<DisplayObject> DeserializeTxt(string fileName)
         {
             var result = new List<DisplayObject>();
@@ -28,7 +30,7 @@ namespace ClassesForms
                     if (txt[i] == '{')
                     {
                         int close = TxtSerializator.CloseBracketInd(txt, i, "{");
-                        string txtObj = txt.Substring(i + 1, close - i - 2).Trim();
+                        string txtObj = txt.Substring(i + 1, close - i - 2).Trim(trimChars);
                         i = close;
                         DisplayObject obj = DeserializeTxtObject(txtObj) as DisplayObject;
                         obj.shape.Position = new Vector2f(obj.left, obj.top);
@@ -76,6 +78,19 @@ namespace ClassesForms
                             await SerializeTxtObject(sw, field.GetValue(obj));
                         }
                     }
+                    foreach (PropertyInfo property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                    {
+                        bool ignore = false;
+                        object[] attributes = property.GetCustomAttributes(true);
+                        foreach (Attribute attribute in attributes)
+                            if (attribute is JsonIgnoreAttribute)
+                                ignore = true;
+                        if (!ignore)
+                        {
+                            await sw.WriteAsync($"{property.Name}: ");
+                            await SerializeTxtObject(sw, property.GetValue(obj));
+                        }
+                    }
                 }
                 await sw.WriteAsync(endObject);
             }
@@ -95,14 +110,22 @@ namespace ClassesForms
                 while (j + 1 < txt.Length && txt[++j] != ':') ;
                 if (j + 1 < txt.Length)
                 {
-                    string field = txt.Substring(i, j - i).Trim();
+                    string field = txt.Substring(i, j - i).Trim(trimChars);
                     i = j + 1;
                     if (txt[i + 1] == '{')
                     {
                         int close = CloseBracketInd(txt, i + 1, "{");
                         object? value = DeserializeTxtObject(txt.Substring(i + 3, close - i - 2));
                         FieldInfo fieldInfo = objType.GetField(field);
-                        fieldInfo.SetValue(resultObject, value);
+                        if (fieldInfo == null)
+                        {
+                            PropertyInfo propertyInfo = objType.GetProperty(field);
+                            propertyInfo.SetValue(resultObject, value);
+                        }
+                        else
+                        {
+                            fieldInfo.SetValue(resultObject, value);
+                        }
                         i = close + 1;
                     }
                     else
@@ -110,7 +133,7 @@ namespace ClassesForms
                         while (j + 1 < txt.Length && txt[++j] != ',') ;
                         if (j + 1 < txt.Length)
                         {
-                            string value = txt.Substring(i, j - i).Trim();
+                            string value = txt.Substring(i, j - i).Trim(trimChars);
                             i = j + 1;
                             if (field.Equals("type"))
                             {
