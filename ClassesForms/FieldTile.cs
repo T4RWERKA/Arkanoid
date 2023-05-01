@@ -36,9 +36,7 @@ namespace Classes
         private MyColor _color;
         private Bonuses bonuses;
 
-        public FieldTile() : base() 
-        {
-        }
+        public FieldTile() : base() { }
         public FieldTile(int x, int y, int width, int height) : 
             base(x, y, width, height)
         { } 
@@ -48,8 +46,6 @@ namespace Classes
             bonuses = new Bonuses();
             color = MyColor.Red;
         }
-        public void AddBonus() { }
-
         public override void OnCollision(object? sender, CollisionEventArgs e)
         {
             DisplayObject obj = (e.obj1 == this) ? e.obj2 : e.obj1;

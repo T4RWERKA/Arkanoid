@@ -56,7 +56,7 @@ namespace Classes
             }
             else if (obj is Bonus)
             {
-                CatchBonusEvent?.Invoke(this, new CatchBonusEventArgs((obj as Bonus).type));
+                CatchBonusEvent?.Invoke(this, new CatchBonusEventArgs((obj as Bonus).bonusType));
             }
         }
         public void OnKeyPressed(object? sender, SFML.Window.KeyEventArgs e)

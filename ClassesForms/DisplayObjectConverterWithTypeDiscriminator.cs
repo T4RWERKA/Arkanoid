@@ -1,4 +1,5 @@
 ﻿using Classes;
+using Microsoft.VisualBasic.FileIO;
 using SFML.Graphics;
 using SFML.System;
 using System;
@@ -17,7 +18,8 @@ namespace ClassesForms
         {
             Ball = 1,
             PlayerTile = 2,
-            FieldTile = 3
+            FieldTile = 3,
+            Bonus = 4
         }
 
         public override bool CanConvert(Type typeToConvert) =>
@@ -55,6 +57,7 @@ namespace ClassesForms
                 TypeDiscriminator.Ball => new Ball(),
                 TypeDiscriminator.PlayerTile => new PlayerTile(),
                 TypeDiscriminator.FieldTile => new FieldTile(),
+                TypeDiscriminator.Bonus => new Bonus(),
                 _ => throw new JsonException()
             };
 
@@ -122,6 +125,10 @@ namespace ClassesForms
                             MyColor color = (MyColor)reader.GetInt32();
                             ((FieldTile)obj).color = color;
                             break;
+                        case "bonusType":
+                            BonusType bonusType = (BonusType)reader.GetInt32();
+                            ((Bonus)obj).bonusType = bonusType;
+                            break;
                     }
                 }
             }
@@ -142,12 +149,15 @@ namespace ClassesForms
                     break;
                 case PlayerTile playerTile:
                     writer.WriteNumber("TypeDiscriminator", (int)TypeDiscriminator.PlayerTile);
-                    // Write any fields exclusive to PlayerTile here
                     break;
                 case FieldTile fieldTile:
                     writer.WriteNumber("TypeDiscriminator", (int)TypeDiscriminator.FieldTile);
                     writer.WriteNumber("durability", fieldTile.durability);
                     writer.WriteNumber("color", (int)fieldTile.color);
+                    break;
+                case Bonus bonus:
+                    writer.WriteNumber("TypeDiscriminator", (int)TypeDiscriminator.Bonus);
+                    writer.WriteNumber("bonusType", (int)bonus.bonusType);
                     break;
                 default:
                     throw new InvalidOperationException("Unexpected object type.");

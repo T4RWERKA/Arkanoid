@@ -21,12 +21,11 @@ namespace Classes
 
         public event EventHandler WinEvent;
         public event EventHandler<UpdateFieldEventArgs> UpdateFieldEvent;
-        public GameField(List<DisplayObject> displayObjects, int gameAreaWidth, int infoAreaWidth, int height)
+        public GameField(int gameAreaWidth, int infoAreaWidth, int height)
         {
             fieldTiles = new Tiles();
             balls = new Balls();
             bonuses = new Bonuses();
-            this.displayObjects = displayObjects;
             this.width = gameAreaWidth;
             this.height = height;
 
@@ -40,6 +39,7 @@ namespace Classes
         }
         public void InitField(List<DisplayObject> displayObjects)
         {
+            this.displayObjects = displayObjects;
             tilesNumber = 0;
             if (displayObjects.Count == 0)
             {
@@ -126,6 +126,9 @@ namespace Classes
                         case PlayerTile player:
                             playerTile = player;
                             break;
+                        case Bonus bonus:
+                            bonuses.Add(bonus);
+                            break;
                     }
                 }
             }
@@ -141,7 +144,7 @@ namespace Classes
             else
             {
                 Random random = new Random();
-                double probability = 0.2;
+                double probability = 1.4;
                 double randomValue = random.NextDouble();
                 if (randomValue < probability)
                 {

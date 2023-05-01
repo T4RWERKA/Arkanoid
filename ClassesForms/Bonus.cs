@@ -17,9 +17,31 @@ namespace ClassesForms
     internal class Bonus: DisplayObject
     {
         private static readonly string blueTexturePath = @"textures\BlueBonus.png";
-        public readonly int defaultSpeed = 2;
+        private readonly int defaultSpeed = 2;
 
-        public BonusType type;
+        public BonusType bonusType
+        {
+            get 
+            {
+                return _type;
+            }
+            set
+            {
+                _type = value;
+                shape.Texture = new Texture(bonusType switch
+                {
+                    BonusType.Points_100 => blueTexturePath,
+                    _ => throw new NotImplementedException(),
+                }
+            );
+            }
+        }
+        private BonusType _type;
+        public Bonus(): base()
+        {
+            shape = new RectangleShape();
+            ((RectangleShape)shape).Size = new Vector2f(48, 24);
+        }
         public Bonus(int x, int y): base()
         {
             shape = new RectangleShape();
@@ -28,13 +50,8 @@ namespace ClassesForms
             InitCoordinates();
 
             Random random = new Random();
-            type = (BonusType)random.Next(Enum.GetValues(typeof(BonusType)).Length);
-            shape.Texture = new Texture(type switch
-            {
-                BonusType.Points_100 => blueTexturePath
-            }
-            );
-
+            bonusType = (BonusType)random.Next(Enum.GetValues(typeof(BonusType)).Length);
+            
             movable = true;
             breaking = false;
             speed = new Vector2i(0, defaultSpeed);

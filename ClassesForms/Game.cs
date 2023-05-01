@@ -44,7 +44,7 @@ namespace Classes
             BallFellEvent += OnBallFell;
 
             displayObjects = new List<DisplayObject>();
-            gameField = new GameField(displayObjects, (int)gameFieldWidth, (int)infoFieldWidth, (int)height);
+            gameField = new GameField((int)gameFieldWidth, (int)infoFieldWidth, (int)height);
             gameField.infoField.LoseEvent += OnLose;
             BallFellEvent += gameField.infoField.OnBallFell;
 
