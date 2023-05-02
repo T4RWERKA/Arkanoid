@@ -144,7 +144,7 @@ namespace Classes
             else
             {
                 Random random = new Random();
-                double probability = 1.4;
+                double probability = 0.3;
                 double randomValue = random.NextDouble();
                 if (randomValue < probability)
                 {

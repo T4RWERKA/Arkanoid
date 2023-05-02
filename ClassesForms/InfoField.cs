@@ -110,7 +110,7 @@ namespace Classes
         }
         public void OnBallFell(object? sender, EventArgs e)
         {
-            //lifes.RemoveAt(lifes.Count - 1);
+            lifes.RemoveAt(lifes.Count - 1);
             if (lifes.Count == 0)
                 LoseEvent?.Invoke(this, EventArgs.Empty);
         }
